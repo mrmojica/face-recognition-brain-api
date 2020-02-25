@@ -1,4 +1,7 @@
 const express = require("express");
+const bcrypt = require("bcrypt");
+
+const saltRounds = 10;
 
 const app = express();
 
@@ -18,10 +21,17 @@ const database = {
     {
       id: "1234",
       name: "Cindy",
-      email: "Cindy@gmail.com",
+      email: "cindy@gmail.com",
       password: "chocolate",
       entries: 0,
       joined: new Date()
+    }
+  ],
+  login: [
+    {
+      id: "123",
+      hash: "",
+      email: "mike@gmail.com"
     }
   ]
 };
@@ -31,6 +41,24 @@ app.get("/", (req, res) => {
 });
 
 app.post("/signin", (req, res) => {
+  //   // Load hash from your password DB.
+  //   bcrypt.compare(
+  //     "cookies",
+  //     "$2b$10$4v6BNf6WfmpEmSkQ8hN2aeOIir0PzKQBiewTlptHAB9zodJ8HvCjS",
+  //     function(err, result) {
+  //       // result == true
+  //       console.log("first guess", result);
+  //     }
+  //   );
+  //   bcrypt.compare(
+  //     "donut",
+  //     "$2b$10$4v6BNf6WfmpEmSkQ8hN2aeOIir0PzKQBiewTlptHAB9zodJ8HvCjS",
+  //     function(err, result) {
+  //       // result == false
+  //       console.log("second guess", result);
+  //     }
+  //   );
+
   if (
     req.body.email === database.users[0].email &&
     req.body.password === database.users[0].password
@@ -42,11 +70,20 @@ app.post("/signin", (req, res) => {
 });
 
 app.post("/register", (req, res) => {
+  const { password, email, name } = req.body;
+
+  //   bcrypt.hash(password, saltRounds, function(err, hash) {
+  //     // Store hash in your password DB.
+  //     console.log(hash);
+  //   });
+
   database.users.push({
     id: "1235",
+    name,
+    email,
+    password,
     entries: 0,
-    joined: new Date(),
-    ...req.body
+    joined: new Date()
   });
 
   res.json(database.users[database.users.length - 1]);

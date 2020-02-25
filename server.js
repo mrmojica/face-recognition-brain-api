@@ -1,12 +1,15 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
+const cors = require("cors");
 
 const saltRounds = 10;
 
 const app = express();
 
-// parse json
+// Parse json
 app.use(express.json());
+// Enable CORS
+app.use(cors());
 
 const database = {
   users: [
@@ -113,8 +116,8 @@ app.put("/image", (req, res) => {
   }
 });
 
-app.listen(3000, () => {
-  console.log("app is running on port 3000");
+app.listen(3001, () => {
+  console.log("app is running on port 3001");
 });
 
 const getUserById = id =>

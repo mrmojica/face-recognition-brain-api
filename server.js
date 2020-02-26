@@ -85,25 +85,39 @@ app.post("/signin", (req, res) => {
 
 app.post("/register", (req, res) => {
   const { password, email, name } = req.body;
+  const errorResponse = res
+    .status(400)
+    .json({ success: false, errorMessage: "Unable to register!" });
 
-  //   bcrypt.hash(password, saltRounds, function(err, hash) {
-  //     // Store hash in your password DB.
-  //     console.log(hash);
-  //   });
+  bcrypt.hash(password, saltRounds, (err, hash) => {
+    if (err) {
+      return errorResponse;
+    }
 
-  db("users")
-    // will returns all of the columns of insert
-    .returning("*")
-    .insert({ email, name, joined: new Date() })
-    .then(users => {
-      // should only return a single user
-      res.json({ success: true, user: users[0] });
-    })
-    .catch(err =>
-      res
-        .status(400)
-        .json({ success: false, errorMessage: "Unable to register!" })
-    );
+    // Store hash and email in login table, and add user to users table.
+    return db
+      .transaction(trx => {
+        trx
+          .insert({
+            hash,
+            email
+          })
+          .into("login")
+          .returning("email")
+          .then(loginEmail =>
+            trx("users")
+              // Will return all columns of insert
+              .returning("*")
+              .insert({ email: loginEmail[0], name, joined: new Date() })
+              .then(users => {
+                res.json({ success: true, user: users[0] });
+              })
+          )
+          .then(trx.commit)
+          .catch(trx.rollback);
+      })
+      .catch(err => errorResponse);
+  });
 });
 
 app.get("/profile/:id", (req, res) => {

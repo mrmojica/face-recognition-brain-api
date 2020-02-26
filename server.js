@@ -1,6 +1,9 @@
 const express = require("express");
+// https://www.npmjs.com/package/bcrypt
 const bcrypt = require("bcrypt");
+// https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
 const cors = require("cors");
+// http://knexjs.org/#Builder
 const knex = require("knex");
 
 const db = knex({
@@ -55,43 +58,51 @@ app.get("/", (req, res) => {
 });
 
 app.post("/signin", (req, res) => {
-  //   // Load hash from your password DB.
-  //   bcrypt.compare(
-  //     "cookies",
-  //     "$2b$10$4v6BNf6WfmpEmSkQ8hN2aeOIir0PzKQBiewTlptHAB9zodJ8HvCjS",
-  //     function(err, result) {
-  //       // result == true
-  //       console.log("first guess", result);
-  //     }
-  //   );
-  //   bcrypt.compare(
-  //     "donut",
-  //     "$2b$10$4v6BNf6WfmpEmSkQ8hN2aeOIir0PzKQBiewTlptHAB9zodJ8HvCjS",
-  //     function(err, result) {
-  //       // result == false
-  //       console.log("second guess", result);
-  //     }
-  //   );
-
-  if (
-    req.body.email === database.users[0].email &&
-    req.body.password === database.users[0].password
-  ) {
-    res.json(database.users[0]);
-  } else {
-    res.status(400).json("error logging in");
-  }
+  db.select("email", "hash")
+    .from("login")
+    .where("email", "=", req.body.email)
+    .then(data =>
+      bcrypt
+        .compare(req.body.password, data[0].hash)
+        .then(isValid => {
+          if (isValid) {
+            return db
+              .select("*")
+              .from("users")
+              .where("email", "=", req.body.email)
+              .then(user => res.json({ success: true, user: user[0] }))
+              .catch(err =>
+                res
+                  .status(400)
+                  .json({ success: false, errorMessage: "Unable to get user!" })
+              );
+          } else {
+            return res
+              .status(400)
+              .json({ success: false, errorMessage: "Incorrect credentials!" });
+          }
+        })
+        .catch(err =>
+          res
+            .status(400)
+            .json({ success: false, errorMessage: "Incorrect credentials!" })
+        )
+    )
+    .catch(err =>
+      res
+        .status(400)
+        .json({ success: false, errorMessage: "Incorrect credentials!" })
+    );
 });
 
 app.post("/register", (req, res) => {
   const { password, email, name } = req.body;
-  const errorResponse = res
-    .status(400)
-    .json({ success: false, errorMessage: "Unable to register!" });
 
   bcrypt.hash(password, saltRounds, (err, hash) => {
     if (err) {
-      return errorResponse;
+      return res
+        .status(400)
+        .json({ success: false, errorMessage: "Unable to register!" });
     }
 
     // Store hash and email in login table, and add user to users table.
@@ -114,9 +125,14 @@ app.post("/register", (req, res) => {
               })
           )
           .then(trx.commit)
+          // If anything fails rollback the changes.
           .catch(trx.rollback);
       })
-      .catch(err => errorResponse);
+      .catch(err =>
+        res
+          .status(400)
+          .json({ success: false, errorMessage: "Unable to register!" })
+      );
   });
 });
 
@@ -152,6 +168,3 @@ app.put("/image", (req, res) => {
 app.listen(3001, () => {
   console.log("app is running on port 3001");
 });
-
-const getUserById = id =>
-  database.users.find(({ id: userId }) => userId === id);

@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const cors = require("cors");
 const knex = require("knex");
 
-const pg = knex({
+const db = knex({
   client: "pg",
   connection: {
     host: "127.0.0.1",
@@ -91,15 +91,19 @@ app.post("/register", (req, res) => {
   //     console.log(hash);
   //   });
 
-  database.users.push({
-    id: "1235",
-    name,
-    email,
-    entries: 0,
-    joined: new Date()
-  });
-
-  res.json(database.users[database.users.length - 1]);
+  db("users")
+    // will returns all of the columns of insert
+    .returning("*")
+    .insert({ email, name, joined: new Date() })
+    .then(users => {
+      // should only return a single user
+      res.json({ success: true, user: users[0] });
+    })
+    .catch(err =>
+      res
+        .status(400)
+        .json({ success: false, errorMessage: "Unable to register!" })
+    );
 });
 
 app.get("/profile/:id", (req, res) => {

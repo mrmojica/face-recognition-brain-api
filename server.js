@@ -25,34 +25,6 @@ app.use(express.json());
 // Enable CORS
 app.use(cors());
 
-const database = {
-  users: [
-    {
-      id: "123",
-      name: "Mike",
-      email: "mike@gmail.com",
-      password: "cookies",
-      entries: 0,
-      joined: new Date()
-    },
-    {
-      id: "1234",
-      name: "Cindy",
-      email: "cindy@gmail.com",
-      password: "chocolate",
-      entries: 0,
-      joined: new Date()
-    }
-  ],
-  login: [
-    {
-      id: "123",
-      hash: "",
-      email: "mike@gmail.com"
-    }
-  ]
-};
-
 app.get("/", (req, res) => {
   res.send(database.users);
 });

@@ -1,6 +1,17 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const cors = require("cors");
+const knex = require("knex");
+
+const pg = knex({
+  client: "pg",
+  connection: {
+    host: "127.0.0.1",
+    user: "michaelmojica",
+    password: "",
+    database: "face-recognition-brain"
+  }
+});
 
 const saltRounds = 10;
 

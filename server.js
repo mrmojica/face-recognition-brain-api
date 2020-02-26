@@ -108,13 +108,18 @@ app.post("/register", (req, res) => {
 
 app.get("/profile/:id", (req, res) => {
   const id = req.params.id;
-  const user = getUserById(id);
 
-  if (user) {
-    res.json(user);
-  } else {
-    res.status(400).json("user not found");
-  }
+  db.select("*")
+    .from("users")
+    .where("id", id)
+    .then(user => {
+      if (user.length) {
+        res.json(user[0]);
+      } else {
+        res.status(400).json("Not found");
+      }
+    })
+    .catch(err => res.status(400).json("Error getting user"));
 });
 
 app.put("/image", (req, res) => {

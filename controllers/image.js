@@ -4,7 +4,7 @@ const app = new Clarifai.App({
   apiKey: process.env.CLARIFAI_API_KEY
 });
 
-const handleClarafaiAPICall = () => (req, res) =>
+const handleClarafaiAPICall = (req, res) =>
   app.models
     .predict(clarifai.FACE_DETECT_MODEL, req.body.imageUrl, {
       language: "en"

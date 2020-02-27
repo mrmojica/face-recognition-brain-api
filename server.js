@@ -38,7 +38,7 @@ app.post("/register", register.handleRegister(db, bcrypt, saltRounds));
 app.post("/signin", signin.handleSignin(db, bcrypt));
 
 app.put("/image", image.handleImage(db));
-app.post("/imageUrl", image.handleClarafaiAPICall());
+app.post("/imageUrl", (req, res) => image.handleClarafaiAPICall(req, res));
 
 app.get("/profile/:id", profile.handleProfileGet(db));
 

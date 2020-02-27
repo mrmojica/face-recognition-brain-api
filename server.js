@@ -1,3 +1,5 @@
+// loads environment variables from a .env file into process.env.
+require("dotenv").config();
 const express = require("express");
 // https://www.npmjs.com/package/bcrypt
 const bcrypt = require("bcrypt");
@@ -35,6 +37,7 @@ app.post("/register", register.handleRegister(db, bcrypt, saltRounds));
 app.post("/signin", signin.handleSignin(db, bcrypt));
 
 app.put("/image", image.handleImage(db));
+app.post("/imageUrl", image.handleClarafaiAPICall());
 
 app.get("/profile/:id", profile.handleProfileGet(db));
 

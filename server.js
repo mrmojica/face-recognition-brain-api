@@ -41,6 +41,8 @@ app.post("/imageUrl", image.handleClarafaiAPICall());
 
 app.get("/profile/:id", profile.handleProfileGet(db));
 
-app.listen(3001, () => {
-  console.log("app is running on port 3001");
+const PORT = process.env.PORT;
+
+app.listen(PORT, () => {
+  console.log(`app is running on port ${process.env.PORT}`);
 });

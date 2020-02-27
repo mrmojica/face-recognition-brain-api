@@ -32,6 +32,8 @@ app.use(express.json());
 // Enable CORS
 app.use(cors());
 
+app.get("/", (req, res) => res.json("server is working!"));
+
 app.post("/register", register.handleRegister(db, bcrypt, saltRounds));
 
 app.post("/signin", signin.handleSignin(db, bcrypt));
@@ -43,6 +45,6 @@ app.get("/profile/:id", profile.handleProfileGet(db));
 
 const PORT = process.env.PORT;
 
-app.listen(PORT, () => {
+app.listen(PORT || 3000, () => {
   console.log(`app is running on port ${process.env.PORT}`);
 });

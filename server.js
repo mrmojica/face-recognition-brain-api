@@ -15,11 +15,10 @@ const profile = require("./controllers/profile");
 
 const db = knex({
   client: "pg",
+  // Connect to Heroku DB
   connection: {
-    host: "127.0.0.1",
-    user: "michaelmojica",
-    password: "",
-    database: "face-recognition-brain"
+    host: process.env.DATABASE_URL,
+    ssl: true
   }
 });
 

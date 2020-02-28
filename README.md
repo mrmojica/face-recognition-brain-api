@@ -9,5 +9,11 @@ This application allows users to detect faces on images using the Clarafai API. 
 - PostgreSQL
 - Bcrypt
 - Cors
+- Clarafai API
 
 ## Client (https://github.com/mrmojica/face-recognition-brain)
+
+- React
+- Particles
+- Tilt
+- Tachyons
